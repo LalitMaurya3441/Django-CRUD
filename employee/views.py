@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect  
+from django.shortcuts import render, redirect ,get_object_or_404
 from employee.forms import EmployeeForm  
 from employee.models import Employee  
 
@@ -14,15 +14,17 @@ def emp(request):
                 pass  
     else:  
         form = EmployeeForm()  
-    return render(request,'index.html',{'form':form})  
+    return render(request,'home.html',{'form':form})  
 
 def show(request):  
     employees = Employee.objects.all()  
     return render(request,"show.html",{'employees':employees})  
 
 def edit(request, id):  
-    employee = Employee.objects.get(id=id)  
-    return render(request,'edit.html', {'employee':employee})  
+    employee = get_object_or_404(Employee, id=id)  
+    form = EmployeeForm(instance=employee)
+    return render(request,'edit.html', {'form': form, 'employee': employee})  
+ 
 
 def update(request, id):  
     employee = Employee.objects.get(id=id)  
@@ -30,9 +32,18 @@ def update(request, id):
     if form.is_valid():  
         form.save()  
         return redirect("/show")  
-    return render(request, 'edit.html', {'employee': employee})  
+    else:
+        form = EmployeeForm(instance=employee) 
+    return render(request, 'edit.html', {'form': form, 'employee': employee})  
+
     
 def destroy(request, id):  
     employee = Employee.objects.get(id=id)  
     employee.delete()  
     return redirect("/show") 
+def home(request):  
+    # form = EmployeeForm()  
+    return render(request, 'home.html')
+
+
+
